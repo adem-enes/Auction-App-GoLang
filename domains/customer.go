@@ -2,11 +2,6 @@ package domains
 
 import "errors"
 
-/*
-- Might add the login logout..
-
-*/
-
 type Customer struct {
 	idNumber    int
 	Name        string
@@ -21,14 +16,13 @@ func init() {
 	Customers = make(map[int]*Customer)
 }
 
-func NewCustomer(IdNumber int, Name, LastName string, PhoneNumber int, Wallet int) (*Customer, error) {
+func NewCustomer(IdNumber int, Name, LastName string, PhoneNumber int) (*Customer, error) {
 	customer := &Customer{
 		idNumber:    IdNumber,
 		Name:        Name,
 		LastName:    LastName,
 		phoneNumber: PhoneNumber,
-		wallet:      Wallet,
-		// wallet:      1000, // It might be like this too..
+		wallet:      1000,
 	}
 
 	if err := customer.validate(); err != nil {
@@ -49,6 +43,14 @@ func (customer *Customer) validate() error {
 	return nil
 }
 
+func CheckCustomer(customerId int) bool {
+	if _, ok := Customers[customerId]; ok {
+		return true
+	} else {
+		return false
+	}
+}
+
 func (customer *Customer) GetId() int {
 	return customer.idNumber
 }
@@ -56,7 +58,14 @@ func (customer *Customer) GetId() int {
 func (customer *Customer) GetWallet() int {
 	return customer.wallet
 }
-
 func (customer *Customer) SetWallet(wallet int) {
 	customer.wallet = wallet
+}
+
+func (customer *Customer) GetPhone() int {
+	return customer.phoneNumber
+}
+
+func (customer *Customer) SetPhone(phone int) {
+	customer.phoneNumber = phone
 }

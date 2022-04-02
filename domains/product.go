@@ -2,29 +2,28 @@ package domains
 
 import (
 	"errors"
-	"math/rand"
+
+	"github.com/google/uuid"
 )
 
 type Product struct {
-	id        int
+	id        uuid.UUID
 	Name      string
-	Type      string
 	Price     int
 	SoldPrice int
 	owner     *Customer
 }
 
-var Products map[int]*Product
+var Products map[uuid.UUID]*Product
 
 func init() {
-	Products = make(map[int]*Product)
+	Products = make(map[uuid.UUID]*Product)
 }
 
-func NewProduct(Name, Type string, Price int, Owner *Customer) (*Product, error) {
+func NewProduct(Name string, Price int, Owner *Customer) (*Product, error) {
 	product := &Product{
-		id:        rand.Int(),
+		id:        uuid.New(),
 		Name:      Name,
-		Type:      Type,
 		Price:     Price,
 		owner:     Owner,
 		SoldPrice: 0, //If haven't been sold
@@ -57,7 +56,7 @@ func (product *Product) GetOwner() *Customer {
 	return product.owner
 }
 
-func CheckProduct(productId int) (*Product, error) {
+func CheckProduct(productId uuid.UUID) (*Product, error) {
 
 	product, ok := Products[productId]
 	if !ok {

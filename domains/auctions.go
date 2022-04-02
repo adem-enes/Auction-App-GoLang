@@ -1,6 +1,9 @@
 package domains
 
-import "math/rand"
+import (
+	"errors"
+	"math/rand"
+)
 
 type Auctions struct {
 	id     int
@@ -22,5 +25,16 @@ func NewReport(Price int, Buyer, Seller *Customer) {
 		Seller: Seller,
 	}
 
+	if err := report.validate(); err != nil {
+		NewReport(report.Price, report.Buyer, report.Seller)
+	}
+
 	AuctionReports[report.id] = report
+}
+
+func (auctions *Auctions) validate() error {
+	if _, ok := AuctionReports[auctions.id]; ok {
+		return errors.New("This report already exist")
+	}
+	return nil
 }
