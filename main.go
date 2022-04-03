@@ -54,14 +54,10 @@ func menu() {
 	case 4: //Create New Customer
 		createCustomer()
 	case 5: // Auction
-		var productId string
-		fmt.Print("ProductId: ")
-		fmt.Scan(&productId)
-
+		productId := getProductFromOwner()
 		if _, err := uuid.Parse(productId); err == nil {
 			auction(uuid.MustParse(productId))
 		} else {
-			fmt.Println("Invalid Product Id.. Try Again..")
 			countDown(2)
 			clearScreen()
 		}
@@ -144,9 +140,9 @@ func createProduct() {
 	fmt.Println("Product Values:")
 	fmt.Println("---------------------------------------------------------------------")
 
-	fmt.Print("Product Name: \t")
+	fmt.Print("Product Name: ")
 	fmt.Scan(&name)
-	fmt.Print("Product Price: \t")
+	fmt.Print("Product Price: ")
 	fmt.Scan(&price)
 
 	var ownerId int
@@ -174,17 +170,17 @@ func createCustomer() {
 	fmt.Println("---------------------------------------------------------------------")
 
 	var idNumber int
-	fmt.Print("Customer Id Number: \t")
+	fmt.Print("Customer Id Number:")
 	fmt.Scan(&idNumber)
 
 	if !domains.CheckCustomer(idNumber) {
-		fmt.Print("Customer Name: \t")
+		fmt.Print("Customer Name: ")
 		fmt.Scan(&name)
-		fmt.Print("Customer LastName: \t")
+		fmt.Print("Customer LastName: ")
 		fmt.Scan(&lastName)
 
 		var phone int
-		fmt.Print("Customer Phone: \t")
+		fmt.Print("Customer Phone: ")
 		fmt.Scan(&phone)
 
 		domains.NewCustomer(idNumber, name, lastName, phone)
@@ -195,6 +191,37 @@ func createCustomer() {
 		clearScreen()
 		createCustomer()
 	}
+}
+func getProductFromOwner() string {
+	var idNumber int
+	fmt.Print("Customer Id Number: ")
+	fmt.Scan(&idNumber)
+
+	if domains.CheckCustomer(idNumber) {
+		showMyProducts(idNumber)
+		fmt.Println("\n---------------------------------------------------------------------")
+		fmt.Println("Choose Product You Want to Sell..")
+
+		var productId string
+		fmt.Print("ProductId: ")
+		fmt.Scan(&productId)
+		if _, err := uuid.Parse(productId); err == nil {
+			if product, ok := domains.Products[uuid.MustParse(productId)]; ok && product.GetOwner().GetId() == idNumber {
+				return productId
+			} else {
+				fmt.Println("This Product doesn't belong to",
+					domains.Customers[idNumber].Name, " ", domains.Customers[idNumber].LastName)
+				return ""
+			}
+		} else {
+			fmt.Println("\n---------------------------------------------------------------------")
+			fmt.Println("Invalid Product Id.. Try Again..")
+		}
+	} else {
+		fmt.Println("\n---------------------------------------------------------------------")
+		fmt.Println("Invalid Customer Id.. Try Again..")
+	}
+	return ""
 }
 
 func auction(productId uuid.UUID) {
@@ -254,6 +281,21 @@ func auction(productId uuid.UUID) {
 		}
 	} else {
 		fmt.Println(error)
+	}
+}
+
+func showMyProducts(customerId int) {
+	customer := domains.Customers[customerId]
+	fmt.Println("\n", customer.Name, customer.LastName, "'s Products: ")
+	fmt.Println("---------------------------------------------------------------------")
+	fmt.Println("Products ID \t\t\t\t  Name\t\t Price \t\t SoldPrice")
+	fmt.Print("-------------------------------------- \t -----------")
+	fmt.Println("\t-----------\t---------------")
+	for k, v := range domains.Products {
+		if v.GetOwner().GetId() == customerId {
+			fmt.Print(k)
+			fmt.Println("\t ", v.Name, "\t\t", v.Price, "\t\t", v.SoldPrice)
+		}
 	}
 }
 
