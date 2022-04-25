@@ -226,7 +226,7 @@ func getProductFromOwner() string {
 
 func auction(productId uuid.UUID) {
 	product, error := domains.CheckProduct(productId)
-	auctionCount := rand.Intn(3) + 1
+	auctionCount := rand.Intn(6) + 1
 	// fmt.Println(auctionCount)
 	var lastGivenPrice int
 	lastCustomerId := -1
